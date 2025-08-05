@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>✈️ Airline Ticket Reservation</title>
+
+  <!-- ✅ jsPDF for PDF download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+  </script>
+  
+  <!-- ✅ QRCode.js for generating QR code -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e8f0fe;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2, h3 {
+      color: #0d47a1;
+    }
+    input, select {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .confirmation, .cancel-section, .admin-panel {
+      margin-top: 20px;
+    }
+    .booking-list, .admin-panel {
+      margin-top: 30px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .booking-item {
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
+    .admin-login {
+      margin-top: 30px;
+    }
+    .admin-booking {
+      background: #fff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 4px #ccc;
+    }
+    @media (max-width: 600px) {
+      .container {
+        margin: 10px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+  <h1>✈️ Airline Ticket Reservation</h1>
+
+  <!-- Booking Form -->
+  <div class="booking-form">
+    <h2>Book Your Flight 🛫 💬</h2>
+    <label>Name:</label>
+    <input type="text" id="name" placeholder="Your Name" />
+
+    <label>Mobile Number:</label>
+    <div style="display: flex; align-items: center;">
+      <span style="padding: 10px; background: #eee; border: 1px solid #aaa; border-radius: 6px 0 0 6px;">+91</span>
+      <input type="text" id="mobile" maxlength="10" required placeholder="Enter 10-digit mobile number"
+       style="border-radius: 0 6px 6px 0; border-left: none;" />
+    </div>
+
+    <label>Aadhar Card Number:</label>
+    <input type="text" id="aadhar" maxlength="14" required placeholder="XXXX XXXX XXXX" />
+
+    <label>Gender:</label>
+    <select id="gender">
+      <option value="">-- Select Gender --</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
+
+    <label>Trip Type:</label>
+    <select id="trip-type">
+      <option value="one-way">One-Way</option>
+      <option value="round-trip">Round-Trip</option>
+    </select>
+
+    <label>Flight Name:</label>
+    <select id="flight-name" onchange="updateSeatOptions()">
+      <option value="">-- Select Flight --</option>
+      <option>IndiGo</option>
+      <option>SpiceJet</option>
+      <option>Air India</option>
+      <option>Vistara</option>
+      <option>GoAir</option>
+      <option>Emirates</option>
+      <option>Qatar Airways</option>
+      <option>Lufthansa</option>
+      <option>British Airways</option>
+      <option>Singapore Airlines</option>
+    </select>
+
+    <label>From (Departure City):</label>
+    <select id="from">
+      <option value="">-- Select Departure City --</option>
+      <option>New York</option>
+      <option>Los Angeles</option>
+      <option>Chicago</option>
+      <option>San Francisco</option>
+      <option>Miami</option>
+      <option>Delhi</option>
+      <option>Mumbai</option>
+      <option>London</option>
+      <option>Dubai</option>
+      <option>Tokyo</option>
+      <option>Paris</option>
+      <option>Berlin</option>
+      <option>Toronto</option>
+      <option>Sydney</option>
+      <option>Singapore</option>
+      <option>Rome</option>
+      <option>Bangkok</option>
+      <option>Istanbul</option>
+      <option>Cape Town</option>
+      <option>Doha</option>
+      <option>Madrid</option>
+      <option>Seoul</option>
+      <option>Helsinki</option>
+      <option>Johannesburg</option>
+      <option>Beijing</option>
+      <option>Oslo</option>
+      <option>Vienna</option>
+      <option>Zurich</option>
+      <option>Amsterdam</option>
+      <option>Mexico City</option>
+      <option>Rio de Janeiro</option>
+      <option>Chicago</option>
+      <option>Brussels</option>
+      <option>Warsaw</option>
+      <option>Manila</option>
+      <option>Kuala Lumpur</option>
+      <option>Toronto</option>
+      <option>Auckland</option>
+      <option>Barcelona</option>
+      <option>Stockholm</option>
+    </select>
+
+    <label>To (Destination City):</label>
+    <select id="to">
+      <option value="">-- Select Destination City --</option>
+      <option>New York</option>
+      <option>Los Angeles</option>
+      <option>Chicago</option>
+      <option>San Francisco</option>
+      <option>Miami</option>
+      <option>Delhi</option>
+      <option>Mumbai</option>
+      <option>London</option>
+      <option>Dubai</option>
+      <option>Tokyo</option>
+      <option>Paris</option>
+      <option>Berlin</option>
+      <option>Toronto</option>
+      <option>Sydney</option>
+      <option>Singapore</option>
+      <option>Rome</option>
+      <option>Bangkok</option>
+      <option>Istanbul</option>
+      <option>Cape Town</option>
+      <option>Doha</option>
+      <option>Madrid</option>
+      <option>Seoul</option>
+      <option>Helsinki</option>
+      <option>Johannesburg</option>
+      <option>Beijing</option>
+      <option>Oslo</option>
+      <option>Vienna</option>
+      <option>Zurich</option>
+      <option>Amsterdam</option>
+      <option>Mexico City</option>
+      <option>Rio de Janeiro</option>
+      <option>Chicago</option>
+      <option>Brussels</option>
+      <option>Warsaw</option>
+      <option>Manila</option>
+      <option>Kuala Lumpur</option>
+      <option>Toronto</option>
+      <option>Auckland</option>
+      <option>Barcelona</option>
+      <option>Stockholm</option>
+    </select>
+
+    <label>Date:</label>
+    <input type="date" id="date" />
+
+    <label>Time:</label>
+    <input type="time" id="time" />
+
+    <div id="return-fields" style="display: none;">
+      <label>Return Date:</label>
+      <input type="date" id="return-date" />
+      <label>Return Time:</label>
+      <input type="time" id="return-time" />
+    </div>
+
+    <label>Flight Class:</label>
+    <select id="flight-class" onchange="updateSeatOptions()">
+      <option value="">-- Select Class --</option>
+      <option value="Economy">Economy</option>
+      <option value="Premium Economy">Premium Economy</option>
+      <option value="Business">Business</option>
+      <option value="First Class">First Class</option>
+    </select>
+
+    <label>Select Your Seat:</label>
+    <div id="seat-map" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0;"></div>
+    <input type="hidden" id="seat" />
+
+    <label>Discount Code:</label>
+    <input type="text" id="discount" placeholder="e.g. STUDENT20 / EARLYBIRD10" />
+
+    <p id="price-display"></p>
+    <button onclick="bookFlight()">Book Ticket</button>
+  </div>
+
+  <!-- Confirmation Section -->
+  <div class="confirmation" style="display:none">
+  <h2>Booking Confirmation</h2>
+  <p id="booking-details"></p>
+
+  <div id="qrcode-container" style="margin-top: 20px;">
+    <h3>Scan QR to Pay 💳</h3>
+    <div id="qrcode"></div>
+    <p style="font-size: 12px;">UPI ID: airline@upi</p>
+  </div>
+
+  <button onclick="downloadTicket()">Download Ticket</button>
+  <button onclick="showCancelSection()">Cancel Last Booking</button>
+</div> 
+
+  <!-- Cancel Booking -->
+  <div class="cancel-section" style="display:none">
+    <h2>Cancel Last Booking</h2>
+    <button onclick="cancelLastBooking()">Confirm Cancellation</button>
+  </div>
+
+  <!-- All Bookings -->
+  <div class="booking-list">
+    <h2>All Bookings</h2>
+    <div id="all-bookings"></div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div class="admin-login">
+    <h2>👨‍✈️ Admin Dashboard</h2>
+    <input type="password" id="admin-password" placeholder="Enter Admin Password" />
+    <button onclick="loginAdmin()">Login as Admin</button>
+    <button onclick="logoutAdmin()">Logout</button>
+  </div>
+
+  <div class="admin-panel" style="display:none">
+    <h2>📋 Admin Booking Panel</h2>
+    <select id="filter-flight" onchange="renderAdminBookings()">
+      <option value="">-- All Flights --</option>
+      <option>IndiGo</option>
+      <option>SpiceJet</option>
+      <option>Air India</option>
+      <option>Vistara</option>
+      <option>GoAir</option>
+      <option>Emirates</option>
+      <option>Qatar Airways</option>
+      <option>Lufthansa</option>
+      <option>British Airways</option>
+      <option>Singapore Airlines</option>
+    </select>
+
+    <select id="filter-class" onchange="renderAdminBookings()">
+      <option value="">-- All Classes --</option>
+      <option>Economy</option>
+      <option>Premium Economy</option>
+      <option>Business</option>
+      <option>First Class</option>
+    </select>
+    <input type="date" id="filter-date" onchange="renderAdminBookings()" />
+    <div id="admin-bookings"></div>
+  </div>
+</div>
+
+<script>
+  const seatMap = {
+    "Economy": ["12A", "12B", "12C", "13A", "13B", "13C", "14A", "14B", "14C"],
+    "Premium Economy": ["10A", "10B", "10C", "11A", "11B", "11C"],
+    "Business": ["2A", "2B", "2C", "3A", "3B", "3C"],
+    "First Class": ["1A", "1B", "1C"]
+  };
+
+  const pricing = {
+    "IndiGo": {"Economy": 30000,"Premium Economy": 45000,"Business": 8000,"First Class": 12000},
+    "SpiceJet": {"Economy": 32000,"Premium Economy": 48000,"Business": 8500,"First Class": 12500},
+    "Air India": {"Economy": 35000,"Premium Economy": 50000,"Business": 9000,"First Class": 13000},
+    "Vistara": {"Economy": 34000,"Premium Economy": 52000,"Business": 9500,"First Class": 13500},
+    "GoAir": {"Economy": 28000,"Premium Economy": 42000,"Business": 7800,"First Class": 11000},
+    "Emirates": {"Economy": 80000,"Premium Economy": 12000,"Business": 20000,"First Class": 30000}
+  };
+
+  let bookings = [];
+
+  window.onload = () => {
+    const saved = localStorage.getItem("bookings");
+    if (saved) {
+      bookings = JSON.parse(saved);
+      renderAllBookings();
+      if (bookings.length > 0) displayBooking(bookings[bookings.length - 1]);
+    }
+    document.getElementById("trip-type").addEventListener("change", function () {
+      document.getElementById("return-fields").style.display = this.value === "round-trip" ? "block" : "none";
+    });
+  };
+
+  function updateSeatOptions() {
+    const cls = document.getElementById('flight-class').value;
+    const flight = document.getElementById('flight-name').value;
+    const seatMapDiv = document.getElementById('seat-map');
+    const seatInput = document.getElementById('seat');
+    seatInput.value = "";
+    seatMapDiv.innerHTML = "";
+
+    const bookedSeats = bookings
+      .filter(b => b.flightClass === cls && b.flightName === flight)
+      .map(b => b.seat);
+
+    if (!cls || !flight || !seatMap[cls] || !pricing[flight]) {
+      seatMapDiv.innerHTML = "<p>Please select both flight and class to view seat map.</p>";
+      return;
+    }
+
+    seatMap[cls].forEach(seat => {
+      const btn = document.createElement("button");
+      btn.textContent = seat;
+      btn.style.padding = "10px";
+      btn.style.borderRadius = "6px";
+      btn.style.border = "1px solid #888";
+      btn.style.cursor = "pointer";
+      btn.style.backgroundColor = bookedSeats.includes(seat) ? "#ccc" : "#0d47a1";
+      btn.style.color = bookedSeats.includes(seat) ? "#666" : "#fff";
+      btn.disabled = bookedSeats.includes(seat);
+
+      btn.addEventListener("click", () => {
+        seatInput.value = seat;
+        seatMapDiv.querySelectorAll("button").forEach(b => {
+          if (!b.disabled) b.style.backgroundColor = "#0d47a1";
+        });
+        btn.style.backgroundColor = "#388e3c";
+      });
+
+      seatMapDiv.appendChild(btn);
+    });
+
+    const price = pricing[flight]?.[cls];
+    document.getElementById('price-display').innerHTML = (price) ? `<strong>Price:</strong> ₹${price}` : "";
+  }
+
+  document.getElementById("aadhar").addEventListener("input", function (e) {
+    let value = e.target.value.replace(/\D/g, "").substring(0, 12);
+    let formatted = value.match(/.{1,4}/g)?.join(" ") || "";
+    e.target.value = formatted;
+  });
+
+  document.getElementById("mobile").addEventListener("input", function (e) {
+    e.target.value = e.target.value.replace(/\D/g, "").substring(0, 10);
+  });
+
+  function bookFlight() {
+    const name = document.getElementById('name').value.trim();
+    const mobile = document.getElementById('mobile').value.trim();
+    const aadhar = document.getElementById('aadhar').value.trim();
+    const gender = document.getElementById('gender').value;
+    const discountCode = document.getElementById('discount').value.trim().toUpperCase();
+    const tripType = document.getElementById('trip-type').value;
+    const flightName = document.getElementById('flight-name').value;
+    const from = document.getElementById('from').value;
+    const to = document.getElementById('to').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const flightClass = document.getElementById('flight-class').value;
+    const seat = document.getElementById('seat').value;
+    const returnDate = document.getElementById('return-date').value;
+    const returnTime = document.getElementById('return-time').value;
+    let price = pricing[flightName]?.[flightClass];
+
+    if (!name || !mobile || !aadhar || !gender || !flightName || !from || !to || !date || !time || !flightClass || !seat ||
+        (tripType === "round-trip" && (!returnDate || !returnTime))) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (from === to) {
+      alert("Departure and destination must differ.");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(mobile)) {
+      alert("Mobile number must be 10 digits.");
+      return;
+    }
+
+    const cleanAadhar = aadhar.replace(/\s/g, '');
+    if (!/^\d{12}$/.test(cleanAadhar)) {
+      alert("Aadhar number must be 12 digits.");
+      return;
+    }
+
+    if (discountCode === "STUDENT20") price *= 0.8;
+    else if (discountCode === "EARLYBIRD10") price *= 0.9;
+
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    const userOtp = prompt(`Enter OTP sent (simulated): ${otp}`);
+    if (userOtp != otp) {
+      alert("Invalid OTP.");
+      return;
+    }
+
+    const booking = {
+      name,
+      mobile: "+91" + mobile,
+      aadhar: cleanAadhar,
+      gender,
+      discountCode,
+      tripType,
+      flightName,
+      from,
+      to,
+      date,
+      time,
+      returnDate: tripType === "round-trip" ? returnDate : null,
+      returnTime: tripType === "round-trip" ? returnTime : null,
+      seat,
+      flightClass,
+      price: Math.round(price)
+    };
+
+    bookings.push(booking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+    fetch('http://localhost:5000/api/book', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(booking)
+    })
+    .then(res => res.json())
+    .then(data => console.log('✅ Booking saved to backend:', data))
+    .catch(err => console.error('❌ Backend save failed:', err));
+    displayBooking(booking);
+    renderAllBookings();
+    renderAdminBookings();
+    document.querySelector(".booking-form").reset();
+    document.getElementById("seat-map").innerHTML = "";
+    document.getElementById("price-display").innerHTML = "";
+  }
+
+  function displayBooking(b) {
+    document.getElementById("booking-details").innerHTML = `
+      <strong>Name:</strong> ${b.name}<br>
+      <strong>Gender:</strong> ${b.gender}<br>
+      <strong>Mobile:</strong> ${b.mobile}<br>
+      <strong>Aadhar:</strong> ${b.aadhar}<br>
+      <strong>Discount Code:</strong> ${b.discountCode || "None"}<br>
+      <strong>Trip:</strong> ${b.tripType}<br>
+      <strong>Flight:</strong> ${b.flightName}<br>
+      <strong>Route:</strong> ${b.from} → ${b.to}<br>
+      <strong>Date:</strong> ${b.date} | <strong>Time:</strong> ${b.time}<br>
+      ${b.tripType === "round-trip" ? `<strong>Return:</strong> ${b.returnDate} at ${b.returnTime}<br>` : ""}
+      <strong>Class:</strong> ${b.flightClass}, <strong>Seat:</strong> ${b.seat}<br>
+      <strong>Price:</strong> ₹${b.price}
+    `;
+    document.querySelector(".confirmation").style.display = "block";
+    
+    // ✅ Generate QR code (simulate UPI or payment link)
+    const qrContainer = document.getElementById("qrcode");
+    qrContainer.innerHTML = ""; // Clear previous QR
+    const paymentText = `upi://pay?pa=airline@upi&pn=Airline%20Reservation&am=${b.price}&cu=INR&tn=Flight%20Ticket`;
+    new QRCode(qrContainer, {
+      text: paymentText,
+      width: 180,
+      height: 180,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  async function downloadTicket() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const b = bookings[bookings.length - 1];
+    let y = 20;
+
+    doc.setFontSize(18);
+    doc.text("✈️ Airline Ticket ", 20, y);
+    y += 10;
+
+    doc.setFontSize(12);
+    const lines = [
+      `Name: ${b.name}`,
+      `Mobile: ${b.mobile}`,
+      `Gender: ${b.gender}`,
+      `Aadhar: ${b.aadhar}`,
+      `Flight: ${b.flightName}`,
+      `Route: ${b.from} → ${b.to}`,
+      `Date: ${b.date} ${b.time}`,
+      ...(b.tripType === "round-trip" ? [`Return: ${b.returnDate} ${b.returnTime}`] : []),
+      `Class: ${b.flightClass}`,
+      `Seat: ${b.seat}`,
+      `Price: ₹${b.price}`,
+      `Discount Code: ${b.discountCode || "None"}`,
+      `Trip Type: ${b.tripType}`
+    ];
+
+    lines.forEach(line => {
+      doc.text(line, 20, y += 8);
+    });
+    
+    // Generate base64 QR for PDF
+    const tempQR = document.createElement("div");
+    const paymentText = `upi://pay?pa=airline@upi&pn=Airline%20Reservation&am=${b.price}&cu=INR&tn=Flight%20Ticket`;
+    new QRCode(tempQR, {
+      text: paymentText,
+      width: 100,
+      height: 100
+    });
+
+    setTimeout(() => {
+      const img = tempQR.querySelector("img");
+      if (img) {
+        doc.addImage(img.src, "PNG", 140, 10, 50, 50);
+      }
+      doc.save("Airline_Ticket.pdf");
+    }, 500);
+  }
+
+  function showCancelSection() {
+    document.querySelector(".cancel-section").style.display = "block";
+  }
+
+  function cancelLastBooking() {
+    if (bookings.length === 0) return;
+    bookings.pop();
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+    renderAllBookings();
+    renderAdminBookings();
+    document.querySelector(".confirmation").style.display = "none";
+    document.querySelector(".cancel-section").style.display = "none";
+  }
+
+  function loginAdmin() {
+    if (document.getElementById("admin-password").value === "admin123") {
+      document.querySelector(".admin-panel").style.display = "block";
+      renderAdminBookings();
+    } else alert("❌ Incorrect password.");
+  }
+
+  function logoutAdmin() {
+    document.querySelector(".admin-panel").style.display = "none";
+    document.getElementById("admin-password").value = "";
+  }
+
+  function renderAllBookings() {
+    const div = document.getElementById("all-bookings");
+    div.innerHTML = "";
+    bookings.forEach(b => {
+      div.innerHTML += `<div class="booking-item">
+        <strong>${b.name}</strong> - ${b.flightName} (${b.flightClass})<br>
+        ${b.from} → ${b.to} on ${b.date} at ${b.time}, Seat: ${b.seat}<br>
+        ₹${b.price}
+      </div>`;
+    });
+  }
+
+  function renderAdminBookings() {
+    const flight = document.getElementById("filter-flight").value;
+    const cls = document.getElementById("filter-class").value;
+    const dt = document.getElementById("filter-date").value;
+    const div = document.getElementById("admin-bookings");
+    div.innerHTML = "";
+
+    const filtered = bookings.filter(b =>
+      (!flight || b.flightName === flight) &&
+      (!cls || b.flightClass === cls) &&
+      (!dt || b.date === dt)
+    );
+
+    if (filtered.length === 0) {
+      div.innerHTML = "<p>No bookings match the filter.</p>";
+      return;
+    }
+
+    let revenue = 0;
+    filtered.forEach(b => {
+      revenue += b.price || 0;
+      const index = bookings.indexOf(b);
+      div.innerHTML += `
+        <div class="admin-booking">
+          <strong>${b.name}</strong><br>${b.flightName} | ${b.from} -→ ${b.to}<br>
+          ${b.date} ${b.time} | ${b.flightClass} | Seat: ${b.seat}<br>
+          ₹${b.price}<br>
+          <button onclick="deleteBooking(${index})">Delete</button>
+        </div>`;
+    });
+
+    div.innerHTML += `<h3>Total Revenue: ₹${revenue}</h3>`;
+  }
+
+  function deleteBooking(index) {
+    if (confirm("Delete this booking?")) {
+      bookings.splice(index, 1);
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+      renderAllBookings();
+      renderAdminBookings();
+    }
+  }
+</script>
+</body>
+</html>
